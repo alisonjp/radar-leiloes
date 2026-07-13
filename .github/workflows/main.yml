@@ -19,6 +19,10 @@ jobs:
       - name: Instalar dependencias
         run: |
           pip install requests
+          pip install supabase
 
       - name: Executar robo Muller
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: python robos/muller.py
