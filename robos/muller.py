@@ -1,86 +1,58 @@
-import os
 import re
 from pathlib import Path
 
-from supabase import create_client
-
-print("=== MULLER -> SUPABASE ===")
-
-url = os.environ["SUPABASE_URL"]
-key = os.environ["SUPABASE_SERVICE_ROLE_KEY"]
-
-supabase = create_client(url, key)
-
-arquivo = Path("amostra_muller.html")
+arquivo = Path("amostra_lote_7393.html")
 
 conteudo = arquivo.read_text(encoding="utf-8")
 
-links = sorted(
-    set(
-        re.findall(
-            r"/item/\d+/detalhes\?page=1",
-            conteudo
-        )
-    )
-)
-
-titulos = re.findall(
-    r"<h5>(.*?)</h5>",
+titulo = re.search(
+    r"<h1>(APARTAMENTO.*?|CASA.*?|TERRENO.*?)</h1>",
     conteudo,
     re.DOTALL
 )
 
-titulos = [
-    t.strip()
-    for t in titulos
-    if t.strip() != "Lance Inicial"
-]
-
-cidades = re.findall(
+cidade = re.search(
     r"<b>Cidade:</b>\s*([^<]+)",
     conteudo
 )
 
-enderecos = re.findall(
-    r"<br><b>Endereço:</b>\s*([^<]+)",
+bairro = re.search(
+    r"Bairro:\s*([^\.]+)",
     conteudo
 )
 
-quantidade = min(
-    len(links),
-    len(titulos),
-    len(cidades),
-    len(enderecos)
+data_1 = re.search(
+    r"Data 1º Leilão:</strong>\s*([^<]+)",
+    conteudo
 )
 
-print(f"Imóveis encontrados: {quantidade}")
+valor_1 = re.search(
+    r"Data 1º Leilão:.*?Lance Inicial:</strong>\s*R\$([0-9\.\,]+)",
+    conteudo,
+    re.DOTALL
+)
 
-titulo = titulos[0]
-cidade = cidades[0].strip()
-endereco = enderecos[0].strip()
-link = links[0]
+data_2 = re.search(
+    r"Data 2º Leilão:</strong>\s*([^<]+)",
+    conteudo
+)
 
-tipo = "OUTRO"
+valor_2 = re.search(
+    r"Data 2º Leilão:.*?Lance Inicial:</strong>\s*R\$([0-9\.\,]+)",
+    conteudo,
+    re.DOTALL
+)
 
-if "APARTAMENTO" in titulo.upper():
-    tipo = "APARTAMENTO"
-elif "CASA" in titulo.upper():
-    tipo = "CASA"
-elif "TERRENO" in titulo.upper():
-    tipo = "TERRENO"
+avaliacao = re.search(
+    r"Valor de Avaliação:</strong>\s*R\$([0-9\.\,]+)",
+    conteudo
+)
 
-dados = {
-    "titulo": titulo,
-    "tipo_imovel": tipo,
-    "cidade": cidade,
-    "endereco": endereco,
-    "url_lote": f"https://www.mullerleiloes.com.br{link}",
-    "leiloeiro": "MULLER",
-    "status": "ATIVO",
-    "fonte_id": 1
-}
-
-resultado = supabase.table("imoveis").insert(dados).execute()
-
-print("Imóvel inserido com sucesso")
-print(titulo)
+print("TITULO:", titulo.group(1) if titulo else "")
+print("CIDADE:", cidade.group(1) if cidade else "")
+print("BAIRRO:", bairro.group(1) if bairro else "")
+print("DATA 1:", data_1.group(1) if data_1 else "")
+print("VALOR 1:", valor_1.group(1) if valor_1 else "")
+print("DATA 2:", data_2.group(1) if data_2 else "")
+print("VALOR 2:", valor_2.group(1) if valor_2 else "")
+print("AVALIACAO:", avaliacao.group(1) if avaliacao else "")
