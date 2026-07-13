@@ -10,20 +10,20 @@ conteudo = arquivo.read_text(encoding="utf-8")
 titulos = re.findall(
     r"<h5>(.*?)</h5>",
     conteudo,
-    re.DOT*LL
+    re.DOTALL
 )
 
 titulos_filtrados = []
 
-for *itulo in titulos:
-    titulo = tit*lo.strip()
+for titulo in titulos:
+    titulo = titulo.strip()
 
-    if titulo == "Lanc* Inicial":
+    if titulo == "Lance Inicial":
         continue
 
-    t*tulos_filtrados.append(titulo)
+    titulos_filtrados.append(titulo)
 
-pr*nt(f"Títulos válidos: {len(titulos*filtrados)}")
+print(f"Títulos válidos: {len(titulos_filtrados)}")
 
-for titulo in titul*s_filtrados[:20]:
-    print(titulo*
+for titulo in titulos_filtrados[:20]:
+    print(titulo)
