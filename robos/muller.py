@@ -4,7 +4,7 @@ from supabase import create_client
 print("=== TESTE SUPABASE ===")
 
 url = os.environ["SUPABASE_URL"]
-key = os.environ["SUPABASE_ANON_KEY"]
+key = os.environ["SUPABASE_SERVICE_ROLE_KEY"]
 
 supabase = create_client(url, key)
 
@@ -21,3 +21,4 @@ dados = {
 resultado = supabase.table("imoveis").insert(dados).execute()
 
 print("Inserido com sucesso")
+print(resultado)
