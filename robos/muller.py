@@ -1,6 +1,7 @@
 import os
 import re
 from pathlib import Path
+from datetime import datetime
 
 from supabase import create_client
 
@@ -66,6 +67,16 @@ avaliacao = re.search(
     conteudo
 )
 
+data_1_formatada = datetime.strptime(
+    data_1.group(1).strip(),
+    "%d/%m/%Y %H:%M"
+).isoformat()
+
+data_2_formatada = datetime.strptime(
+    data_2.group(1).strip(),
+    "%d/%m/%Y %H:%M"
+).isoformat()
+
 dados = {
     "titulo": titulo.group(1).strip(),
     "tipo_imovel": "APARTAMENTO",
@@ -73,9 +84,9 @@ dados = {
     "bairro": bairro.group(1).strip(),
     "endereco": endereco.group(1).strip(),
     "valor_avaliacao": moeda_para_numero(avaliacao.group(1)),
-    "data_1_leilao": data_1.group(1).strip(),
+    "data_1_leilao": data_1_formatada,
     "valor_1_leilao": moeda_para_numero(valor_1.group(1)),
-    "data_2_leilao": data_2.group(1).strip(),
+    "data_2_leilao": data_2_formatada,
     "valor_2_leilao": moeda_para_numero(valor_2.group(1)),
     "url_lote": "https://www.mullerleiloes.com.br/item/7393/detalhes?page=1",
     "leiloeiro": "MULLER",
@@ -88,3 +99,4 @@ print(dados)
 resultado = supabase.table("imoveis").insert(dados).execute()
 
 print("IMÓVEL COMPLETO INSERIDO COM SUCESSO")
+print(resultado)
