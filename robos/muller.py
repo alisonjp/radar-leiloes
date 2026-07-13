@@ -1,16 +1,17 @@
 from pathlib import Path
+import re
 
 print("Robô Müller iniciado")
 
 arquivo = Path("amostra_muller.html")
 
-if not arquivo.exists():
-    print("Arquivo não encontrado")
-    exit()
-
 conteudo = arquivo.read_text(encoding="utf-8")
 
-total_links = conteudo.count("/item/")
+links = sorted(set(
+    re.findall(r"/item/\d+/detalhes\?page=1", conteudo)
+))
 
-print(f"Arquivo carregado")
-print(f"Ocorrências de lotes encontradas: {total_links}")
+print(f"Links encontrados: {len(links)}")
+
+for link in links[:20]:
+    print(link)
