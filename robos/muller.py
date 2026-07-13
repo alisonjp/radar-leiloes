@@ -1,9 +1,22 @@
+import os
 import re
 from pathlib import Path
 
-arquivo = Path("amostra_lote_7393.html")
+from supabase import create_client
 
+url = os.environ["SUPABASE_URL"]
+key = os.environ["SUPABASE_SERVICE_ROLE_KEY"]
+
+supabase = create_client(url, key)
+
+arquivo = Path("amostra_lote_7393.html")
 conteudo = arquivo.read_text(encoding="utf-8")
+
+
+def moeda_para_numero(valor):
+    valor = valor.replace(".", "").replace(",", ".")
+    return float(valor)
+
 
 titulo = re.search(
     r"<h1>(APARTAMENTO.*?|CASA.*?|TERRENO.*?)</h1>",
@@ -18,6 +31,11 @@ cidade = re.search(
 
 bairro = re.search(
     r"Bairro:\s*([^\.]+)",
+    conteudo
+)
+
+endereco = re.search(
+    r"<b>Endereço:</b>\s*([^<]+)",
     conteudo
 )
 
@@ -48,11 +66,25 @@ avaliacao = re.search(
     conteudo
 )
 
-print("TITULO:", titulo.group(1) if titulo else "")
-print("CIDADE:", cidade.group(1) if cidade else "")
-print("BAIRRO:", bairro.group(1) if bairro else "")
-print("DATA 1:", data_1.group(1) if data_1 else "")
-print("VALOR 1:", valor_1.group(1) if valor_1 else "")
-print("DATA 2:", data_2.group(1) if data_2 else "")
-print("VALOR 2:", valor_2.group(1) if valor_2 else "")
-print("AVALIACAO:", avaliacao.group(1) if avaliacao else "")
+dados = {
+    "titulo": titulo.group(1).strip(),
+    "tipo_imovel": "APARTAMENTO",
+    "cidade": cidade.group(1).strip(),
+    "bairro": bairro.group(1).strip(),
+    "endereco": endereco.group(1).strip(),
+    "valor_avaliacao": moeda_para_numero(avaliacao.group(1)),
+    "data_1_leilao": data_1.group(1).strip(),
+    "valor_1_leilao": moeda_para_numero(valor_1.group(1)),
+    "data_2_leilao": data_2.group(1).strip(),
+    "valor_2_leilao": moeda_para_numero(valor_2.group(1)),
+    "url_lote": "https://www.mullerleiloes.com.br/item/7393/detalhes?page=1",
+    "leiloeiro": "MULLER",
+    "status": "ATIVO",
+    "fonte_id": 1
+}
+
+print(dados)
+
+resultado = supabase.table("imoveis").insert(dados).execute()
+
+print("IMÓVEL COMPLETO INSERIDO COM SUCESSO")
