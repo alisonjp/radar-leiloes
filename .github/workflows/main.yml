@@ -16,5 +16,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Instalar dependencias
+        run: |
+          pip install requests
+
       - name: Executar robo Muller
         run: python robos/muller.py
