@@ -7,11 +7,13 @@ arquivo = Path("amostra_muller.html")
 
 conteudo = arquivo.read_text(encoding="utf-8")
 
-links = sorted(set(
-    re.findall(r"/item/\d+/detalhes\?page=1", conteudo)
-))
+titulos = re.findall(
+    r"<h5>(.*?)</h5>",
+    conteudo,
+    re.DOTALL
+)
 
-print(f"Links encontrados: {len(links)}")
+print(f"Títulos encontrados: {len(titulos)}")
 
-for link in links[:20]:
-    print(link)
+for titulo in titulos[:20]:
+    print(titulo.strip())
