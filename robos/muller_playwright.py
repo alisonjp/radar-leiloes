@@ -3,6 +3,7 @@ from playwright.sync_api import sync_playwright
 print("Iniciando Playwright")
 
 with sync_playwright() as p:
+
     browser = p.chromium.launch(
         headless=True
     )
@@ -11,14 +12,19 @@ with sync_playwright() as p:
 
     page.goto(
         "https://www.mullerleiloes.com.br/lotes/imovel",
-        wait_until="networkidle",
-        timeout=60000
+        wait_until="domcontentloaded",
+        timeout=120000
     )
 
-    print("Título da página:")
+    page.wait_for_timeout(5000)
+
+    print("Título:")
     print(page.title())
 
-    print("URL final:")
+    print("URL:")
     print(page.url)
+
+    print("HTML:")
+    print(len(page.content()))
 
     browser.close()
