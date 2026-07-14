@@ -16,7 +16,9 @@ with sync_playwright() as p:
         timeout=120000
     )
 
-    page.wait_for_timeout(5000)
+    print("Aguardando Cloudflare...")
+
+    page.wait_for_timeout(20000)
 
     print("Título:")
     print(page.title())
@@ -24,7 +26,14 @@ with sync_playwright() as p:
     print("URL:")
     print(page.url)
 
+    html = page.content()
+
     print("HTML:")
-    print(len(page.content()))
+    print(len(html))
+
+    if "APARTAMENTO" in html.upper():
+        print("SUCESSO - ENCONTROU IMOVEIS")
+    else:
+        print("AINDA BLOQUEADO")
 
     browser.close()
