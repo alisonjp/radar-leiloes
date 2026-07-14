@@ -20,9 +20,11 @@ jobs:
         run: |
           pip install requests
           pip install supabase
+          pip install playwright
 
-      - name: Executar robo Muller
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: python robos/muller.py
+      - name: Instalar navegador
+        run: |
+          playwright install chromium
+
+      - name: Executar Playwright Muller
+        run: python robos/muller_playwright.py
